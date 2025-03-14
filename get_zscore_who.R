@@ -44,6 +44,40 @@ get_wlz <- function(data_boys, data_girls, Sex, Wt, Len){
   return(WLZ)
 }
 
+get_waz <- function(data_boys, data_girls, Sex, Wt, Age){
+  # Check if Sex is valid
+  if (!(Sex %in% c(1, 2))) {
+    return(NA)  # Return NA for invalid sex values
+  }
+  
+  # Select dataset based on Sex
+  if (Sex == 2) {
+    df <- data_boys  # Boys dataset
+  } else {
+    df <- data_girls  # Girls dataset
+  }
+  
+  # Find closest length
+  closest_row <- df %>%
+    slice_min(abs(Month - Age), n = 1, with_ties = FALSE)
+  
+  # Check if row exists
+  if (nrow(closest_row) == 0) {
+    return(NA)  # Return NA if no matching length found
+  }
+  
+  # Extract LMS values
+  L <- closest_row$L
+  M <- closest_row$M
+  S <- closest_row$S
+  X <- Wt
+  
+  # Compute WLZ using the LMS formula
+  WAZ <- ((X / M)^L - 1) / (L * S)
+  
+  return(WAZ)
+}
+
 
 # id <- which(is.na(demo[which(demo$study_id=="MINT-177"),"wlz"])) 
 # obs_weight <- as.numeric(demo[which(demo$study_id=="MINT-177"),"weight_average"][id,])
